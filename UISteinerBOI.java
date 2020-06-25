@@ -1,3 +1,13 @@
+/**
+ * @Author: John Nestor <nestorj>
+ * @Date:   2020-06-24T21:01:04-04:00
+ * @Email:  nestorj@lafayette.edu
+ * @Last modified by:   nestorj
+ * @Last modified time: 2020-06-24T21:01:04-04:00
+ */
+
+
+
 import java.lang.Math;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
@@ -13,213 +23,213 @@ import java.io.*;
 
 public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UIGraphChangeListener {
 
-    private STGraph gr;
-    private UIHananGraph ugr;
-    private STPrimMST prim;  // needed for tree calculations
-    private STBOI boi;
+  private STGraph gr;
+  private UIHananGraph ugr;
+  private STPrimMST prim;  // needed for tree calculations
+  private STBOI boi;
 
-    private JPanel statusPanel;
-    private JPanel controlPanel;
-    private JLabel messageLabel;
+  private JPanel statusPanel;
+  private JPanel controlPanel;
+  private JLabel messageLabel;
 
-    private UIValDisplay halfPerimDisplay;
-    private UIValDisplay lengthDisplay;
-    
-    private UIAnimationController ucontrol;
+  private UIValDisplay halfPerimDisplay;
+  private UIValDisplay lengthDisplay;
 
-    public static final long serialVersionUID = 1L;  // to shut up serialization warning
+  private UIAnimationController ucontrol;
 
-    public UISteinerBOI() {
-	super();
-	setLayout(new BorderLayout());
-	gr = new STGraph();
-	ugr = new UIHananGraph(gr, this);
-	prim = new STPrimMST(null, gr);  // no animation callbacks for MST
-	boi = new STBOI(this, gr);
-	ucontrol = new UIAnimationController(this);
+  public static final long serialVersionUID = 1L;  // to shut up serialization warning
 
-        statusPanel = new JPanel();
-        statusPanel.setLayout(new GridLayout(1,2));
-        halfPerimDisplay = new UIValDisplay("Half Perimeter",0);
-        statusPanel.add(halfPerimDisplay);
-        lengthDisplay = new UIValDisplay("Edge Length",0);
-        statusPanel.add(lengthDisplay);
-	add(statusPanel, BorderLayout.NORTH);
-	add(ugr, BorderLayout.CENTER);
+  public UISteinerBOI() {
+    super();
+    setLayout(new BorderLayout());
+    gr = new STGraph();
+    ugr = new UIHananGraph(gr, this);
+    prim = new STPrimMST(null, gr);  // no animation callbacks for MST
+    boi = new STBOI(this, gr);
+    ucontrol = new UIAnimationController(this);
 
-	controlPanel = new JPanel();
-	controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-	controlPanel.add(ucontrol);
+    statusPanel = new JPanel();
+    statusPanel.setLayout(new GridLayout(1,2));
+    halfPerimDisplay = new UIValDisplay("Half Perimeter",0);
+    statusPanel.add(halfPerimDisplay);
+    lengthDisplay = new UIValDisplay("Edge Length",0);
+    statusPanel.add(lengthDisplay);
+    add(statusPanel, BorderLayout.NORTH);
+    add(ugr, BorderLayout.CENTER);
 
-	messageLabel = new JLabel("");
-	controlPanel.add(messageLabel);
-	add(controlPanel, BorderLayout.SOUTH);
+    controlPanel = new JPanel();
+    controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    controlPanel.add(ucontrol);
 
-
-        setBorder( BorderFactory.createEmptyBorder(2,2,2,2) );
-	
-    }
-
-    public void setCostDisplay() {
-	halfPerimDisplay.setValue(gr.halfPerim());
-	lengthDisplay.setValue(gr.edgeLength());
-    }
-
-    public void setMessage(String m) {
-	messageLabel.setText(m);
-    }
-
-    public void initRandom() {
-	int width = ugr.getWidth();
-	int height = ugr.getHeight();
-	gr.clearGraph();
-	gr.addRandomNodes(10, width, height); // change to use range of graphics window
-	try {
-	    prim.primMST(false);
-	} catch (InterruptedException e) { }
-    }
-
-    public void readGraph(BufferedReader in) throws IOException {
-	gr.readGraph(in);
-    }
-	
+    messageLabel = new JLabel("");
+    controlPanel.add(messageLabel);
+    add(controlPanel, BorderLayout.SOUTH);
 
 
-    public void paintComponent(Graphics g) {
-	super.paintComponent(g);
-	setCostDisplay();
-    }
+    setBorder( BorderFactory.createEmptyBorder(2,2,2,2) );
 
-    /*----------------------------------------------------------------------*/	
-    /*        methods from UIAnimated interface                             */
-    /*----------------------------------------------------------------------*/
+  }
 
+  public void setCostDisplay() {
+    halfPerimDisplay.setValue(gr.halfPerim());
+    lengthDisplay.setValue(gr.edgeLength());
+  }
 
-	
-    /* from the new thread - use to call the algorithm code */
-    public void runAnimation() throws InterruptedException {
-	boi.improve(true);
-    }
+  public void setMessage(String m) {
+    messageLabel.setText(m);
+  }
 
-    /* use to clean up when animation is terminated */
-    public void stopAnimation() {
-	ucontrol.interruptAnimation();	
-    }
-    
-    /*----------------------------------------------------------------------*/	
-    /*        methods from BOIInterface                                     */
-    /*----------------------------------------------------------------------*/
+  public void initRandom() {
+    int width = ugr.getWidth();
+    int height = ugr.getHeight();
+    gr.clearGraph();
+    gr.addRandomNodes(10, width, height); // change to use range of graphics window
+    try {
+      prim.primMST(false);
+    } catch (InterruptedException e) { }
+  }
 
-
-    /** Interesting event: initialization */
-    public void showBOIInit() throws InterruptedException {
-	System.out.println("showBOIInit");
-	ugr.selectNode(null);
-	ugr.selectEdge(null);
-	setMessage("Starting BOI improve phase");
-	repaint();
-	ucontrol.animateDelay();
-	setMessage(null);
-    }
+  public void readGraph(BufferedReader in) throws IOException {
+    gr.readGraph(in);
+  }
 
 
-    /** Interesting event: show a node/edge candidate */
-    public void showNEPair(STNEPair p) throws InterruptedException {
-	System.out.println("showNEPair - node " + p.getNode() + " edge " + p.getEdge());
-	ugr.selectNEPair(null);  // don't display until calculating gain!
-	ugr.selectNode(p.getNode());
-	ugr.selectEdge(p.getEdge());
-	setMessage("Pair Candidate");
-	repaint();
-//	setMessage("Pair Candidate " + p.getNode() + " " + p.getEdge());
-	ucontrol.animateDelay();
-//	ugr.selectNode(null);
-//	ugr.selectEdge(null);
-//	setMessage(null);
-    }
 
-    /** Interesting event: show the edges that contribute to the gain of a node/edge candidate */
-    public void showNEGain(STNEPair p) throws InterruptedException {
-	System.out.println("showNEGain - node " + p.getNode() + " elimEdge " + p.getElimEdge() + " gain " + p.getGain());
-	ugr.selectNode(p.getNode());
-	ugr.selectEdge(p.getElimEdge());
-	ugr.selectNEPair(p);
-	setMessage("node/edge gain: " + p.getGain());
-	repaint();
-	ucontrol.animateDelay();
-    }
+  public void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    setCostDisplay();
+  }
 
-    /** Interesting event: show replacement of node/edge pair with SP & new edges */
-    public void showNEMod(STNEPair p) throws InterruptedException {
-	ugr.selectNode(null);
-	ugr.selectEdge(null);
-	ugr.selectNEPair(p);
-	setMessage("Applying modification gain=" + p.getGain());
-	repaint();
-	ucontrol.animateDelay();
-    }
-
-    /** Interesting event: show completion of node/edge pair w/ deletion of loop edge */
-    public void showNEModComplete() throws InterruptedException {
-	ugr.selectNEPair(null);
-	setMessage("Modification complete");
-	repaint();
-	ucontrol.animateDelay();
-    }
-
-    /** Interesting event: BOI Completed */
-    public void showBOIComplete(boolean modified) throws InterruptedException {
-	ugr.selectNEPair(null);
-	if (modified) setMessage("Pass completed");
-	else setMessage("Pass completed (no improvemnt)");
-	repaint();
-	ucontrol.animateDelay();
-    }
-
-    /** Interesting event: display distance calculations */
-    public void displayDistances() throws InterruptedException { } // do nothing for now
-    // when we have a distance display, use this to update
-
-    /** Interesting event: display minimum distance node */
-    public void displayClosestNode(STNode cn) throws InterruptedException {
-	ugr.selectNode(cn); // select the closest node
-	repaint();
-	ucontrol.animateDelay();
-	ugr.selectNode(null);
-    }
+  /*----------------------------------------------------------------------*/
+  /*        methods from UIAnimated interface                             */
+  /*----------------------------------------------------------------------*/
 
 
-    /*----------------------------------------------------------------------*/	
-    /*        UIGraphChangeListener method                                  */
-    /*----------------------------------------------------------------------*/
 
-    public void graphChanged() {
-	    ucontrol.interruptAnimation();
-	    try {
-		prim.primMST(false);
-	    } catch (InterruptedException e) { }
+  /* from the new thread - use to call the algorithm code */
+  public void runAnimation() throws InterruptedException {
+    boi.improve(true);
+  }
 
-/*	if (autoMode) { // re-calculate immediately
-	    try {
-		prim.primMST(false);
-	    } catch (InterruptedException e) { }
-	} else {  // can't continue animaton with a changed graph!
-	    ucontrol.interruptAnimation();
-	    gr.clearEdges();
-	    gr.clearVisited(); */
-    }
+  /* use to clean up when animation is terminated */
+  public void stopAnimation() {
+    ucontrol.interruptAnimation();
+  }
 
-    /*----------------------------------------------------------------------*/	
-    /*        main() / unit test                                            */
-    /*----------------------------------------------------------------------*/
+  /*----------------------------------------------------------------------*/
+  /*        methods from BOIInterface                                     */
+  /*----------------------------------------------------------------------*/
 
-    public static void main(String [] args) {
-	JFrame f = new JFrame();
-	UISteinerBOI p = new UISteinerBOI();
-	f.setSize(400,300);
-	f.getContentPane().add(p);
-	f.setVisible(true);
-	p.initRandom();
-    }
+
+  /** Interesting event: initialization */
+  public void showBOIInit() throws InterruptedException {
+    System.out.println("showBOIInit");
+    ugr.selectNode(null);
+    ugr.selectEdge(null);
+    setMessage("Starting BOI improve phase");
+    repaint();
+    ucontrol.animateDelay();
+    setMessage(null);
+  }
+
+
+  /** Interesting event: show a node/edge candidate */
+  public void showNEPair(STNEPair p) throws InterruptedException {
+    System.out.println("showNEPair - node " + p.getNode() + " edge " + p.getEdge());
+    ugr.selectNEPair(null);  // don't display until calculating gain!
+    ugr.selectNode(p.getNode());
+    ugr.selectEdge(p.getEdge());
+    setMessage("Pair Candidate");
+    repaint();
+    //	setMessage("Pair Candidate " + p.getNode() + " " + p.getEdge());
+    ucontrol.animateDelay();
+    //	ugr.selectNode(null);
+    //	ugr.selectEdge(null);
+    //	setMessage(null);
+  }
+
+  /** Interesting event: show the edges that contribute to the gain of a node/edge candidate */
+  public void showNEGain(STNEPair p) throws InterruptedException {
+    System.out.println("showNEGain - node " + p.getNode() + " elimEdge " + p.getElimEdge() + " gain " + p.getGain());
+    ugr.selectNode(p.getNode());
+    ugr.selectEdge(p.getElimEdge());
+    ugr.selectNEPair(p);
+    setMessage("node/edge gain: " + p.getGain());
+    repaint();
+    ucontrol.animateDelay();
+  }
+
+  /** Interesting event: show replacement of node/edge pair with SP & new edges */
+  public void showNEMod(STNEPair p) throws InterruptedException {
+    ugr.selectNode(null);
+    ugr.selectEdge(null);
+    ugr.selectNEPair(p);
+    setMessage("Applying modification gain=" + p.getGain());
+    repaint();
+    ucontrol.animateDelay();
+  }
+
+  /** Interesting event: show completion of node/edge pair w/ deletion of loop edge */
+  public void showNEModComplete() throws InterruptedException {
+    ugr.selectNEPair(null);
+    setMessage("Modification complete");
+    repaint();
+    ucontrol.animateDelay();
+  }
+
+  /** Interesting event: BOI Completed */
+  public void showBOIComplete(boolean modified) throws InterruptedException {
+    ugr.selectNEPair(null);
+    if (modified) setMessage("Pass completed");
+    else setMessage("Pass completed (no improvemnt)");
+    repaint();
+    ucontrol.animateDelay();
+  }
+
+  /** Interesting event: display distance calculations */
+  public void displayDistances() throws InterruptedException { } // do nothing for now
+  // when we have a distance display, use this to update
+
+  /** Interesting event: display minimum distance node */
+  public void displayClosestNode(STNode cn) throws InterruptedException {
+    ugr.selectNode(cn); // select the closest node
+    repaint();
+    ucontrol.animateDelay();
+    ugr.selectNode(null);
+  }
+
+
+  /*----------------------------------------------------------------------*/
+  /*        UIGraphChangeListener method                                  */
+  /*----------------------------------------------------------------------*/
+
+  public void graphChanged() {
+    ucontrol.interruptAnimation();
+    try {
+      prim.primMST(false);
+    } catch (InterruptedException e) { }
+
+      /*	if (autoMode) { // re-calculate immediately
+      try {
+      prim.primMST(false);
+    } catch (InterruptedException e) { }
+  } else {  // can't continue animaton with a changed graph!
+  ucontrol.interruptAnimation();
+  gr.clearEdges();
+  gr.clearVisited(); */
+  }
+
+  /*----------------------------------------------------------------------*/
+  /*        main() / unit test                                            */
+  /*----------------------------------------------------------------------*/
+
+  public static void main(String [] args) {
+    JFrame f = new JFrame();
+    UISteinerBOI p = new UISteinerBOI();
+    f.setSize(400,300);
+    f.getContentPane().add(p);
+    f.setVisible(true);
+    p.initRandom();
+  }
 
 }
