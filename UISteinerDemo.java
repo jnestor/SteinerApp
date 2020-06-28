@@ -154,7 +154,7 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
   public static void main(String [] args) {
     JFrame f = new JFrame();
     UISteinerDemo d = new UISteinerDemo();
-    f.setSize(400,400);
+    f.setSize(600,600);
     f.getContentPane().add(d);
     f.setVisible(true);
   }

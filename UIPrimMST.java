@@ -189,7 +189,7 @@ public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, A
     public static void main(String [] args) {
       JFrame f = new JFrame();
       UIPrimMST p = new UIPrimMST();
-      f.setSize(300,300);
+      f.setSize(600,600);
       f.getContentPane().add(p);
       f.setVisible(true);
     }

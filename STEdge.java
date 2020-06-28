@@ -11,12 +11,14 @@
 import java.awt.Point;
 
 public class STEdge {
-
+  private int id;
   private STNode p1, p2;
   private boolean mark;
   private boolean deleteMark;
+  private static int nextID = 1;
 
   public STEdge(STNode sp1, STNode sp2) {
+    id = nextID++;
     p1 = sp1;
     p2 = sp2;
     mark = false;
@@ -26,6 +28,10 @@ public class STEdge {
   public STNode getP1() { return p1; }
 
   public STNode getP2() { return p2; }
+  
+  public int getID() { return id; }
+  
+  public static void resetIDs() { nextID = 1; }
 
   public int length() { return p1.distanceL1(p2); }
 
@@ -52,7 +58,7 @@ public class STEdge {
   public String toString() {
     Point loc1 = p1.getLocation();
     Point loc2 = p2.getLocation();
-    String s = "Edge[(" + loc1.x + "," + loc1.y + ")-(" +
+    String s = "Edge " + id + " [(" + loc1.x + "," + loc1.y + ")-(" +
     loc2.x + "," + loc2.y + ")]";
     if (getDeleteMark()) s = s + "<DELETED>";
     return s;

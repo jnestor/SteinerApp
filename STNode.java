@@ -12,13 +12,15 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 public class STNode {
-
+  private int id;
   private Point loc;
   private boolean isTerm;
   private boolean visitFlag = false;
   private LinkedList /*<STEdge>*/ edges = new LinkedList/*<STEdge>*/(); // adjacent edges
+  private static int next_id = 1;
 
   public STNode(Point l, boolean isT) {
+    id = next_id++;
     loc = l;
     isTerm = isT;
   }
@@ -31,7 +33,8 @@ public class STNode {
     this(new Point(x,y));
   }
 
-
+  public int getID() { return id; }
+  
   public Point getLocation() { return loc; }
 
   public void setLocation(Point newloc) {
@@ -90,7 +93,7 @@ public class STNode {
 
 
   public String toString() {
-    String s = "Node(" + loc.x + "," + loc.y + "){";
+    String s = "Node " + id + " (" + loc.x + "," + loc.y + "){";
     for (int i=0; i<edges.size(); i++)
     s = s + getEdge(i);
     s = s + "}";

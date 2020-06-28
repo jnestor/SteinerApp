@@ -143,6 +143,7 @@ public class STGraph  {
       e.disconnect();
     }
     edges.clear();
+    STEdge.resetIDs();
   }
 
   public void clearEdgeMarks() {

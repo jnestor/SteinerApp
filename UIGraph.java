@@ -37,7 +37,7 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
     this(g, null);
   }
 
-  protected static final int TERM_SIZE = 8;
+  protected static final int TERM_SIZE = 12;
 
   private void drawNode(Graphics g, STNode n, boolean isSelected) {
     Color fillColor;

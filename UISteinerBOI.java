@@ -154,7 +154,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
     ugr.selectNode(p.getNode());
     ugr.selectEdge(p.getElimEdge());
     ugr.selectNEPair(p);
-    setMessage("node/edge gain: " + p.getGain());
+    setMessage("node " + p.getNode().getID() + " / edge " + p.getElimEdge().getID() + " gain: " + p.getGain());
     repaint();
     ucontrol.animateDelay();
   }
@@ -226,7 +226,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
   public static void main(String [] args) {
     JFrame f = new JFrame();
     UISteinerBOI p = new UISteinerBOI();
-    f.setSize(400,300);
+    f.setSize(600,600);
     f.getContentPane().add(p);
     f.setVisible(true);
     p.initRandom();
