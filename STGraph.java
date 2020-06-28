@@ -179,6 +179,7 @@ public class STGraph  {
     int minY = Integer.MAX_VALUE;
     int maxX = 0;
     int maxY = 0;
+    if (numNodes() == 0) return 0;
     for (int i = 0; i < numNodes(); i++) {
       STNode n = getNode(i);
       int nx = n.getLocation().x;
