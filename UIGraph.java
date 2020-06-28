@@ -52,11 +52,14 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
       g.fillRect(orig_x, orig_y,TERM_SIZE, TERM_SIZE);
       g.setColor(Color.black);
       g.drawRect(orig_x, orig_y,TERM_SIZE, TERM_SIZE);
+      g.drawString("n" + n.getID(), orig_x + TERM_SIZE + 4, orig_y + TERM_SIZE - 2);
     } else {
       g.fillOval(orig_x, orig_y,TERM_SIZE, TERM_SIZE);
       g.setColor(Color.black);
       g.drawOval(orig_x, orig_y,TERM_SIZE, TERM_SIZE);
+      g.drawString("s" + n.getID(), orig_x + TERM_SIZE + 4, orig_y + TERM_SIZE - 2);
     }
+    
   }
 
   private void drawEdge(Graphics g, STEdge e) {
@@ -67,6 +70,20 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
     else g.setColor(Color.red);
     //	System.out.println("drawing edge from " + loc1 + " to " + loc2);
     g.drawLine(loc1.x, loc1.y, loc2.x, loc2.y);
+    // label it
+    int dx, dy, midx, midy, offx, offy;
+    dx = loc2.x - loc1.x;
+    dy = loc2.y - loc1.y;
+    midx = loc1.x + (dx/2);
+    midy = loc1.y + (dy/2);
+    offx = 5;
+    offy = 5;
+    if (dx != 0) {  // hack to space edges - could probably do better
+        double slope = (double)(dy)/(double)(dx);
+        if (slope >= 0 && slope < 1) offy = -5;
+        else if (slope < 0 && slope > -1) offy = 10;
+    }
+    g.drawString("e" + e.getID(), midx+offx, midy+offy);
     g.setColor(Color.black);
   }
 
