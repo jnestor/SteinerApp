@@ -91,6 +91,9 @@ public class STNode {
     return edges.size();
   }
 
+  public static void countReset(){
+      next_id = 1;
+  }
 
   public String toString() {
     String s = "Node " + id + " (" + loc.x + "," + loc.y + "){";

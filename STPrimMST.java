@@ -21,6 +21,8 @@ public class STPrimMST  {
 
   /** find the Minimum Spanning tree using Prim's algorithm.  Adapted from Joe Ganley's Spanning Tree Applet */
   public void primMST(boolean animate) throws InterruptedException {
+     synchronized(this){
+     }
     int n = gr.numNodes();
     int dist[], neigh[], closest, minDist, d;
 
@@ -63,6 +65,7 @@ public class STPrimMST  {
       }
 
       // set an edge from it to its nearest neighbor
+      ui.setText("Connect from node " + closestNode.getID() + " to node " + gr.getNode(neigh[closest]).getID());
       gr.addEdge(closestNode, gr.getNode(neigh[closest]));
       closestNode.setVisited(true);
       if (animate) ui.displayPartialTree();
@@ -77,6 +80,8 @@ public class STPrimMST  {
       }
       if (animate) ui.displayDistances();
     }
+    if(animate)
+    ui.setText("Click to create nodes");
   } // mst()
 
 

@@ -21,6 +21,10 @@ public class STGraph  {
     // check for membership first?
     nodes.add(n);
   }
+  
+  public boolean isEmpty(){
+      return nodes.isEmpty();
+  }
 
   public void addRandomNodes(int numNodes, int xrange, int yrange) {
     int x, y, xoff, yoff;
@@ -159,7 +163,7 @@ public class STGraph  {
     }
   }
 
-  public STEdge getEdge(int i) {
+    public STEdge getEdge(int i) {
     return (STEdge)edges.elementAt(i);
   }
 
@@ -196,6 +200,7 @@ public class STGraph  {
   public void clearGraph() {
     edges.clear();
     nodes.clear();
+    STNode.countReset();
   }
 
   public String toString() {

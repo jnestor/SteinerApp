@@ -20,5 +20,7 @@ interface PrimMSTInterface {
 
   /** Interesting event: display minimum distance node */
   public void displayClosestNode(STNode cn) throws InterruptedException;
+  
+  public void setText(String s);
 
 }

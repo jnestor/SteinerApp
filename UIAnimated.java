@@ -25,4 +25,7 @@ public interface UIAnimated {
 
   /* use to clean up when animation is terminated */
   public void stopAnimation();
+  public void repaint();
+  public void clear();
+  
 }

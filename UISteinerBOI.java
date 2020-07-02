@@ -115,6 +115,10 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
   public void stopAnimation() {
     ucontrol.interruptAnimation();
   }
+  
+  public void clear() {
+        gr.clearGraph();
+    }
 
   /*----------------------------------------------------------------------*/
   /*        methods from BOIInterface                                     */
