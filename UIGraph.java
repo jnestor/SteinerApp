@@ -44,7 +44,7 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
     Point loc = n.getLocation();
     int orig_x = loc.x - TERM_SIZE/2;
     int orig_y = loc.y - TERM_SIZE/2;
-    if ( isSelected ) fillColor = Color.blue;
+    if ( isSelected ) fillColor = Color.yellow;
     else if ( n.isVisited() ) fillColor = Color.green;
     else fillColor = Color.blue;
     g.setColor(fillColor);

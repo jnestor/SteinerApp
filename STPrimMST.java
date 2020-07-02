@@ -59,6 +59,7 @@ public class STPrimMST  {
 
       STNode closestNode = gr.getNode(closest);
       if (animate) {
+          System.out.println("displayClosetNode: " + closestNode);
         ui.displayClosestNode(closestNode);
       }
 
