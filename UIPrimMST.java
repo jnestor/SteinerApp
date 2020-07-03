@@ -149,7 +149,10 @@ public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, A
      * @throws java.lang.InterruptedException
      */
     @Override
-    public void displayDistances() throws InterruptedException {
+    /** Interesting event: display distance calculations */
+    public void displayDistances() throws InterruptedException { 
+        System.out.println("displayDistances not implemented!");
+
     } // do nothing for now
     // when we have a distance display, use this to update
 
