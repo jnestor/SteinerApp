@@ -16,7 +16,7 @@ public class STNode {
   private Point loc;
   private boolean isTerm;
   private boolean visitFlag = false;
-  private LinkedList /*<STEdge>*/ edges = new LinkedList/*<STEdge>*/(); // adjacent edges
+  private LinkedList <STEdge> edges = new LinkedList<STEdge>(); // adjacent edges
   private static int next_id = 1;
 
   public STNode(Point l, boolean isT) {
@@ -101,5 +101,14 @@ public class STNode {
     s = s + getEdge(i);
     s = s + "}";
     return s;
+  }
+  
+  @Override
+  public boolean equals(Object ob){
+      if(ob instanceof STNode){
+          STNode node = (STNode) ob;
+          return id == node.getID();
+      }
+      return false;
   }
 }

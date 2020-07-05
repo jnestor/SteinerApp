@@ -147,6 +147,7 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
         state = STOP;
         if (runner != null) {
             runner.interrupt();
+            ua.stopAnimation();
             runner = null;
         }
     }

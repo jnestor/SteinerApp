@@ -11,11 +11,12 @@
 import java.awt.Point;
 import java.util.Vector;
 import java.io.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class STGraph  {
 
-  private Vector/*<STNode>*/ nodes = new Vector/*<STNode>*/();
-  private Vector/*<STEdge>*/ edges = new Vector/*<STEdge>*/();
+  private CopyOnWriteArrayList<STNode> nodes = new CopyOnWriteArrayList<STNode>();
+  private CopyOnWriteArrayList<STEdge> edges = new CopyOnWriteArrayList<STEdge>();
 
   public void addNode(STNode n) {
     // check for membership first?
@@ -58,7 +59,11 @@ public class STGraph  {
   }
 
   public STNode getNode(int i) {
-    return (STNode)nodes.elementAt(i);
+    return (STNode)nodes.get(i);
+  }
+  
+  public CopyOnWriteArrayList<STNode> getNodes(){
+      return nodes;
   }
 
   /** find a node that "touches" a point within window */
@@ -164,7 +169,7 @@ public class STGraph  {
   }
 
     public STEdge getEdge(int i) {
-    return (STEdge)edges.elementAt(i);
+    return (STEdge)edges.get(i);
   }
 
   public int numEdges() { return edges.size(); }

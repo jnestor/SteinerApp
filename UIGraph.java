@@ -112,7 +112,6 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
   public void selectEdge(STEdge e) { selEdge = e; }
 
   public void paintComponent(Graphics g) {
-    int i;
     super.paintComponent(g);
     drawEdges(g);
     drawNodes(g);
