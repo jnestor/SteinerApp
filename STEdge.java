@@ -109,6 +109,6 @@ public class STEdge implements Comparable<STEdge>{
     }
     
     public String toTableString(){
-        return "Edge [ Node" + p1.getID()+" Node "+p2.getID()+" ]";
+        return "[ n" + p1.getID()+" -- n"+p2.getID()+" ]";
     }
 }

@@ -6,7 +6,6 @@
  * @Last modified by: nestorj
  * @Last modified time: 2020-06-24T20:49:32-04:00
  */
-
 public class STPrimMST {
 
     private PrimMSTInterface ui;
@@ -55,9 +54,9 @@ public class STPrimMST {
             dist[i] = rootNode.distanceL1(gr.getNode(i));
             neigh[i] = 0;
         }
-        if (animate) {
-            ui.displayDistances();
-        }
+//        if (animate) {
+//            ui.displayDistances();
+//        }
 
         // find terminal closest to current partial tree
         for (int i = 1; i < n; i++) {
@@ -71,20 +70,21 @@ public class STPrimMST {
             }
             STNode closestNode = gr.getNode(closest);
             if (animate) {
-                System.out.println("displayClosetNode: " + closestNode);
+                //System.out.println("displayClosetNode: " + closestNode);
                 ui.displayClosestNode(closestNode);
             }
 
             // set an edge from it to its nearest neighbor
-            if(animate)
-            ui.setText("Connect from node " + closestNode.getID() + " to node " + gr.getNode(neigh[closest]).getID());
+            if (animate) {
+                ui.setText("Connect from node " + closestNode.getID() + " to node " + gr.getNode(neigh[closest]).getID());
+            }
             gr.addEdge(closestNode, gr.getNode(neigh[closest]));
-            closestNode.setVisited(true);  
-            
+            closestNode.setVisited(true);
+
             if (animate) {
                 refreshTable();
                 ui.displayPartialTree();
-                table.highlight();
+                highlight();
             }
             // update nearest distances to current partial tree
             for (int j = 1; j < n; j++) {
@@ -94,19 +94,31 @@ public class STPrimMST {
                     neigh[j] = closest;
                 }
             }
-            if (animate) {
-                ui.displayDistances();
-            }
+//            if (animate) {
+//                ui.displayDistances();
+//            }
         }
         if (animate) {
             ui.setText("Click to create nodes");
         }
-        table.empty();
+        empty();
     } // mst()
 
     private void refreshTable() {
-        if (table != null);
-        table.refresh();
+        if (table != null) {
+            table.refresh();
+        }
     }
 
+    private void highlight() {
+        if (table != null) {
+            table.highlight();
+        }
+    }
+
+    private void empty() {
+        if (table != null) {
+            table.empty();
+        }
+    }
 }

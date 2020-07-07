@@ -22,7 +22,9 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultHighlighter;
@@ -54,17 +56,22 @@ public class UIPrimDisTable extends JPanel {
         nodes = data.getNodes();
         edgeNames.setEditable(false);
         edgeDistances.setEditable(false);
+        edgeNames.setBackground(new Color(238, 238, 238));
+        edgeDistances.setBackground(new Color(238, 238, 238));
         JScrollPane scrollLeft = new JScrollPane(edgeNames, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         JScrollPane scrollRight = new JScrollPane(edgeDistances, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollLeft.getHorizontalScrollBar().setModel(scrollRight.getHorizontalScrollBar().getModel());
         scrollLeft.getVerticalScrollBar().setModel(scrollRight.getVerticalScrollBar().getModel());
+        contentPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         setLayout(new BorderLayout());
-        titlePanel.add(new JLabel("Edge", JLabel.CENTER));
-        titlePanel.add(new JLabel("Length", JLabel.CENTER));
+        titlePanel.add(new JLabel("Candidates", JLabel.CENTER));
+        titlePanel.add(new JLabel("Length     ", JLabel.CENTER));
+        titlePanel.setPreferredSize(new Dimension(400, 34));
         contentPanel.add(scrollLeft);
         contentPanel.add(scrollRight);
         titlePanel.setLayout(new GridLayout(1, 2));
         contentPanel.setLayout(new GridLayout(1, 2));
+        contentPanel.setBorder(new EmptyBorder(0, 0, 53, 0));
         add(titlePanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
         edgeTable = new ConcurrentSkipListSet<STEdge>();
@@ -77,7 +84,7 @@ public class UIPrimDisTable extends JPanel {
                 if (nodes.get(i).isVisited()) {
                     for (int j = 0; j < nodes.size(); j++) {
                         if (j != i && !(nodes.get(i).isVisited() && nodes.get(j).isVisited())) {
-                            STEdge edge = new STEdge(nodes.get(i), nodes.get(j),false);
+                            STEdge edge = new STEdge(nodes.get(i), nodes.get(j), false);
                             if (!edgeTable.contains(edge)) {
                                 edgeTable.add(edge);
                             }
@@ -91,8 +98,8 @@ public class UIPrimDisTable extends JPanel {
                 StyledDocument nameDoc = (StyledDocument) edgeNames.getDocument();
                 StyledDocument disDoc = (StyledDocument) edgeDistances.getDocument();
                 STEdge edge = edgeTable.pollFirst();
-                nameDoc.insertString(nameDoc.getLength(), edge.toTableString() + "\n", null);
-                disDoc.insertString(disDoc.getLength(), edge.length() + "\n", null);
+                nameDoc.insertString(nameDoc.getLength(), " " + edge.toTableString() + " " + "\n", null);
+                disDoc.insertString(disDoc.getLength(), " " + edge.length() + " " + "\n", null);
                 SimpleAttributeSet center = new SimpleAttributeSet();
                 StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
                 nameDoc.setParagraphAttributes(0, nameDoc.getLength(), center, false);

@@ -24,6 +24,7 @@ import java.io.*;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 
 public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, ActionListener, UIGraphChangeListener {
 
@@ -33,7 +34,7 @@ public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, A
 
     private JPanel statusPanel;
     private JPanel controlPanel;
-    private Border border = BorderFactory.createLineBorder(Color.black);
+    private Border border = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
     private UIValDisplay halfPerimDisplay;
     private UIValDisplay lengthDisplay;
@@ -84,7 +85,6 @@ public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, A
         controlPanel.add(autoButton);
         add(controlPanel, BorderLayout.SOUTH);
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
     }
 
     public void setCostDisplay() {
