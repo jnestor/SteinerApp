@@ -35,6 +35,10 @@ public class STPrimMST {
         neigh = new int[n];  // "parent" array -
 
         STNode rootNode = gr.getNode(0);
+        if(rootNode==null){
+            gr.clearGraph();
+            return;
+        }
 
         gr.clearEdges();
         gr.clearVisited();

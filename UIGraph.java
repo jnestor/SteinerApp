@@ -159,6 +159,10 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
 
   public void mouseMoved(MouseEvent e) { // do nothing
   }
+  
+  public void clear(){
+      gr.clearGraph();
+  }
 
   public static void main(String [] args) {
     STGraph g = new STGraph();

@@ -59,7 +59,9 @@ public class STGraph  {
   }
 
   public STNode getNode(int i) {
+    if(!nodes.isEmpty())
     return (STNode)nodes.get(i);
+    return null;
   }
   
   public CopyOnWriteArrayList<STNode> getNodes(){

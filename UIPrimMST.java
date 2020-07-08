@@ -127,12 +127,7 @@ public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, A
  /* from the new thread - use to call the algorithm code */
     @Override
     public void runAnimation() throws InterruptedException {
-        //table.refreshTable();
-        if (!gr.isEmpty()) {
             prim.primMST(true);
-        } else {
-            gr.clearGraph();
-        }
     }
 
     /* use to clean up when animation is terminated */
@@ -201,11 +196,7 @@ public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, A
                 ugr.selectNode(null);
                 try {
                     table.setToolTipText("This is not available for auto mode");
-                    if (!gr.isEmpty()) {
                         prim.primMST(false);
-                    } else {
-                        gr.clearGraph();
-                    }
                 } catch (InterruptedException except) {
                 }
                 repaint();

@@ -113,7 +113,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
 
   /* use to clean up when animation is terminated */
   public void stopAnimation() {
-    ucontrol.interruptAnimation();
+    //ucontrol.interruptAnimation();
   }
   
   public void clear() {

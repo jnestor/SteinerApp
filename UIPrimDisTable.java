@@ -66,15 +66,19 @@ public class UIPrimDisTable extends JPanel {
         setLayout(new BorderLayout());
         titlePanel.add(new JLabel("Candidates", JLabel.CENTER));
         titlePanel.add(new JLabel("Length     ", JLabel.CENTER));
-        titlePanel.setPreferredSize(new Dimension(400, 34));
+        titlePanel.setPreferredSize(new Dimension(400, 32));
         contentPanel.add(scrollLeft);
         contentPanel.add(scrollRight);
         titlePanel.setLayout(new GridLayout(1, 2));
         contentPanel.setLayout(new GridLayout(1, 2));
-        contentPanel.setBorder(new EmptyBorder(0, 0, 53, 0));
+        //contentPanel.setBorder(new EmptyBorder(0, 0, 59, 0));
         add(titlePanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
+        JPanel ghost = new JPanel();
+        ghost.setPreferredSize(new Dimension(400,52));
+        add(ghost,BorderLayout.SOUTH);
         edgeTable = new ConcurrentSkipListSet<STEdge>();
+        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
     }
 
     public void refreshTable() {

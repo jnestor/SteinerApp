@@ -169,7 +169,6 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
     }
 
     public synchronized void actionPerformed(ActionEvent e) {
-        System.out.println(getSize());
         String cmd = e.getActionCommand();
         // System.out.println("command = " + cmd);
         if (cmd == "STOP") {
@@ -187,7 +186,6 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
             ua.clear();
             ua.repaint();
             clearButton.setSelected(false);
-            
         } else if (cmd == "RUN") {
             pauseButton.setEnabled(true);
             stepButton.setEnabled(false);
