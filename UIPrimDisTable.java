@@ -30,57 +30,27 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-public class UIPrimDisTable extends JPanel {
+public class UIPrimDisTable extends UITablePanel {
 
-    private final JTextPane edgeNames = new JTextPane();
-    private final JTextPane edgeDistances = new JTextPane();
     private final ConcurrentSkipListSet<STEdge> edgeTable;
-    private final JPanel titlePanel = new JPanel();
-    private final JPanel contentPanel = new JPanel();
-    private final STGraph data;
+    private final STGraph graphData;
     private final CopyOnWriteArrayList<STNode> nodes;
     private final Timer tableThread = new Timer(5, (ActionEvent evt) -> {
         refreshTable();
     });
 
     public UIPrimDisTable(STGraph tree) {
-        setPreferredSize(new Dimension(400, 600));
-        DefaultCaret caret = (DefaultCaret) edgeNames.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-        caret = (DefaultCaret) edgeDistances.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-        data = tree;
-        nodes = data.getNodes();
-        edgeNames.setEditable(false);
-        edgeDistances.setEditable(false);
-        edgeNames.setBackground(new Color(238, 238, 238));
-        edgeDistances.setBackground(new Color(238, 238, 238));
-        JScrollPane scrollLeft = new JScrollPane(edgeNames, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        JScrollPane scrollRight = new JScrollPane(edgeDistances, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollLeft.getHorizontalScrollBar().setModel(scrollRight.getHorizontalScrollBar().getModel());
-        scrollLeft.getVerticalScrollBar().setModel(scrollRight.getVerticalScrollBar().getModel());
-        contentPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        setLayout(new BorderLayout());
-        titlePanel.add(new JLabel("Candidates", JLabel.CENTER));
-        titlePanel.add(new JLabel("Length     ", JLabel.CENTER));
-        titlePanel.setPreferredSize(new Dimension(400, 32));
-        contentPanel.add(scrollLeft);
-        contentPanel.add(scrollRight);
-        titlePanel.setLayout(new GridLayout(1, 2));
-        contentPanel.setLayout(new GridLayout(1, 2));
-        //contentPanel.setBorder(new EmptyBorder(0, 0, 59, 0));
-        add(titlePanel, BorderLayout.NORTH);
-        add(contentPanel, BorderLayout.CENTER);
-        JPanel ghost = new JPanel();
-        ghost.setPreferredSize(new Dimension(400,52));
-        add(ghost,BorderLayout.SOUTH);
+        super("Candidates", "Length     ");
+        graphData = tree;
+        nodes = graphData.getNodes();
         edgeTable = new ConcurrentSkipListSet<STEdge>();
-        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
     }
 
+    @Override
     public void refreshTable() {
         empty();
         if (!nodes.isEmpty()) {
@@ -98,26 +68,15 @@ public class UIPrimDisTable extends JPanel {
             }
         }
         while (!edgeTable.isEmpty()) {
-            try {
-                StyledDocument nameDoc = (StyledDocument) edgeNames.getDocument();
-                StyledDocument disDoc = (StyledDocument) edgeDistances.getDocument();
-                STEdge edge = edgeTable.pollFirst();
-                nameDoc.insertString(nameDoc.getLength(), " " + edge.toTableString() + " " + "\n", null);
-                disDoc.insertString(disDoc.getLength(), " " + edge.length() + " " + "\n", null);
-                SimpleAttributeSet center = new SimpleAttributeSet();
-                StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-                nameDoc.setParagraphAttributes(0, nameDoc.getLength(), center, false);
-                disDoc.setParagraphAttributes(0, disDoc.getLength(), center, false);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(UIPrimDisTable.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            STEdge edge = edgeTable.pollFirst();
+            append(edge.toTableString(), Integer.toString(edge.length()),Color.green,Color.blue);
         }
     }
 
+    @Override
     public void empty() {
         edgeTable.clear();
-        edgeNames.setText("");
-        edgeDistances.setText("");
+        super.empty();
     }
 
     public void refresh() {
@@ -130,21 +89,7 @@ public class UIPrimDisTable extends JPanel {
     }
 
     public void highlight() {
-        highlight(edgeNames);
-        highlight(edgeDistances);
+        highlight(Color.YELLOW);
     }
 
-    private void highlight(JTextPane pane) {
-        if (!pane.getText().isEmpty()) {
-            Highlighter hilit = new DefaultHighlighter();
-            Highlighter.HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.yellow);
-            pane.setHighlighter(hilit);
-            try {
-                hilit.addHighlight(0, pane.getText().indexOf("\n"), painter);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(UIPrimDisTable.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println(pane.getText().indexOf("\n"));
-            }
-        }
-    }
 }

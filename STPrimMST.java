@@ -80,7 +80,7 @@ public class STPrimMST {
 
             // set an edge from it to its nearest neighbor
             if (animate) {
-                ui.setText("Connect from node " + closestNode.getID() + " to node " + gr.getNode(neigh[closest]).getID());
+                ui.setText("Connect from node " + gr.getNode(neigh[closest]).getID() + " to node " + closestNode.getID());
             }
             gr.addEdge(closestNode, gr.getNode(neigh[closest]));
             closestNode.setVisited(true);

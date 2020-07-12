@@ -107,14 +107,14 @@ public class STNEPair implements Comparable/*<STNEPair>*/ {
     if (!modValid()) return false;
     STNode nn = new STNode(steinerPoint, false);  // the new Steiner point
     gr.addNode(nn);
-    System.out.println("disconnecting " + elimEdge);
+//    System.out.println("disconnecting " + elimEdge);
     elimEdge.disconnect();
-    System.out.println("Graph after elimEdge disconnect: " + gr);
+//    System.out.println("Graph after elimEdge disconnect: " + gr);
     STNode n1 = edge.getP1();
     STNode n2 = edge.getP2();
-    System.out.println("disconnecting " + edge);
+//    System.out.println("disconnecting " + edge);
     edge.disconnect();
-    System.out.println("Graph after edge disconnect: " + gr);
+//    System.out.println("Graph after edge disconnect: " + gr);
     gr.addEdge(n1, nn);
     gr.addEdge(n2, nn);
     gr.addEdge(node, nn);
@@ -123,14 +123,30 @@ public class STNEPair implements Comparable/*<STNEPair>*/ {
 
   /** used to sort in DESCENDING order! */
   public int compareTo(Object o) {
-    STNEPair ne = (STNEPair)o;
-    if (getGain() == ne.getGain()) return 0;
-    else if (getGain() < ne.getGain()) return 1;
-    else return -1;
+    STNEPair b = (STNEPair)o;
+    return Integer.valueOf(b.getGain()).compareTo(getGain());
   }
 
   public String toString() {
     return "STNEPair: node " + node + " edge " + edge + " elimEdge " + elimEdge + " gain " + gain;
   }
+  
+  public String toTableString(){
+      return "n"+node.getID()+ " || e" + edge.getID() + " || e" + elimEdge.getID();
+  }
+  
+//  public boolean equals(Object ob){
+//      if (!(ob instanceof STNEPair)){
+//          return false;
+//      }
+//      STNEPair b = (STNEPair) ob;
+//      if(edge.equals(b.getEdge())&&elimEdge.equals(b.getElimEdge())&&gain==b.getGain()){
+//          return true;
+//      }
+//      if(edge.equals(b.getElimEdge())&&elimEdge.equals(b.getEdge())&&gain==b.getGain()){
+//          return true;
+//      }
+//      return false;
+//  }
 
 }

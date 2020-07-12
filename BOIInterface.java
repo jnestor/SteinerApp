@@ -29,5 +29,9 @@ interface BOIInterface {
 
   /** Interesting event: BOI Completed */
   public void showBOIComplete(boolean modified) throws InterruptedException;
+  
+  public void setMessage(String s);
+  
+  public void step();
 
 }

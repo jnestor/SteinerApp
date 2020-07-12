@@ -53,5 +53,9 @@ public class UIValDisplay extends JPanel {
     }
     else vlabel.setText(myFormat.format(d));
   }
+  
+  public void setString(String s){
+      vlabel.setText(s);
+  }
 
 }
