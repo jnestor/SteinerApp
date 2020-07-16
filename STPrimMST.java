@@ -108,7 +108,7 @@ public class STPrimMST {
         empty();
     } // mst()
 
-    private void refreshTable() {
+    private void refreshTable() throws InterruptedException {
         if (table != null) {
             table.refresh();
         }

@@ -34,6 +34,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.Timer;
 
 /**
  * Title: UIAnimationController Description: Controls animation with a VCR
@@ -65,6 +68,7 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
 
     UIAnimated ua;
 
+    
     public void SetAnimated(UIAnimated a) {
         ua = a;
     }
@@ -141,6 +145,7 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
         add(clearButton);
         add(Box.createHorizontalGlue());
         pauseButton.setEnabled(false);
+        //interruptFixer.start();
     }
 
     public void interruptAnimation() {
@@ -149,6 +154,7 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
             runner.interrupt();
             ua.stopAnimation();
             runner = null;
+            ua.stopAnimation();
         }
     }
 
@@ -177,6 +183,7 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
             pauseButton.setEnabled(false);
             stepButton.setEnabled(true);
             interruptAnimation();
+            System.out.println("finished");
         } else if (cmd == "CLEAR") {
             stopButton.setSelected(true);
             runButton.setEnabled(true);
@@ -270,7 +277,8 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
      * @param delayCount
      * @throws java.lang.InterruptedException
      */
-    public synchronized void animateDelay(int delayCount) throws InterruptedException {
+    public synchronized boolean animateDelay(int delayCount) throws InterruptedException {
+//        try{
         Thread.sleep(delayCount * ANIMATE_DELAY / optSpeed);
         if (state == STEP) {
             state = PAUSE;
@@ -279,6 +287,16 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
         while (state == PAUSE) {
             wait();
         }
+//        }
+//        catch(InterruptedException e){
+//            notifyAll();
+////            stopButton.setSelected(true);
+////            runButton.setEnabled(true);
+////            pauseButton.setEnabled(false);
+////            stepButton.setEnabled(true);
+//            interruptAnimation();
+//        }
+        return true;
     }
 
     public synchronized void animateDelay() throws InterruptedException {
@@ -300,6 +318,6 @@ public class UIAnimationController extends JPanel implements Runnable, ActionLis
             }
         }
 
-    }
+    }   
 
 }

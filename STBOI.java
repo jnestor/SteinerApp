@@ -7,21 +7,27 @@
  * @Last modified time: 2020-06-28T12:12:53-04:00
  */
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.Timer;
 
 public class STBOI {
-
     private BOIInterface ui;
     private STGraph gr;
     private PriorityBlockingQueue<STNEPair> mods = new PriorityBlockingQueue<STNEPair>();
     private boolean modified = false;
+    private boolean completed = false;
     UISteinerBOITable table = new UISteinerBOITable(this);
+    private Timer timer;
 
     public STBOI(BOIInterface u, STGraph g) {
         ui = u;
@@ -92,7 +98,7 @@ public class STBOI {
     }
 
     public boolean improve(boolean animate) throws InterruptedException {
-        modified=false;
+        modified = false;
         //	System.out.println("starting improve");
         //	System.out.println(gr);
         STNode n;
@@ -142,16 +148,21 @@ public class STBOI {
                 }
                 if (best_ne.getGain() > 0) {
 //                    System.out.println("Node " + i + " " + n + " new mod " + best_ne);
-                    ui.setMessage("Accepted");
+                    if (animate) {
+                        ui.setMessage("Candidate n" + best_ne.getNode().getID() + " / e" + best_ne.getElimEdge().getID() + " Accepted");
+                    }
                     mods.add(best_ne);
-                    table.refresh();
-                    Thread.sleep(50);
-                    table.highlight(Color.yellow, " " + best_ne.toTableString() + " ", " " + Integer.toString(best_ne.getGain()) + " ");
-                    if(animate)ui.step();
-                }
-                else{
-                    ui.setMessage("Rejected");
-                    if(animate)ui.step();
+                    if (animate) {
+                        table.refresh();
+                        Thread.sleep(300);
+                        table.highlight(Color.yellow, " " + best_ne.toTableString() + " ", " " + Integer.toString(best_ne.getGain()) + " ");
+                        ui.showAccept();
+                    }
+                } else {
+                    ui.setMessage("Candidate n" + best_ne.getNode().getID() + " / e" + best_ne.getElimEdge().getID() + " Rejected");
+                    if (animate) {
+                        ui.showDeny();
+                    }
                 }
             }
         }
@@ -163,33 +174,39 @@ public class STBOI {
         modified = false;
         int i = 1;
         while (!mods.isEmpty()) {
-            table.refresh();
+            if (animate) {
+                table.refresh();
+            }
             Thread.sleep(20);
             STNEPair curmod = mods.poll();
             System.out.println("applying mod " + i + " " + curmod);
             i++;
             // re-calculate gain?
             if (!curmod.modValid()) {
-                if(animate)ui.showNEMod(curmod);
-                table.highlight(Color.red);
-                ui.setMessage("INVALID");
                 if (animate) {
-                    ui.step();
+                    ui.showNEMod(curmod);
+                    table.highlight(Color.red);
+                    ui.setMessage("Modification n" + curmod.getNode().getID() + " / e" + curmod.getElimEdge().getID() + " is no longer valid");
+                    ui.showDeny();
                 }
                 continue;
             }
-            modified=true;
+            modified = true;
             if (animate) {
                 ui.showNEMod(curmod);
+                table.highlight(Color.green);
             }
-            table.highlight(Color.green);
-            Thread.sleep(300);         
-            curmod.applyMod(gr);
-            table.refresh();
+            ui.setMessage("Modification n" + curmod.getNode().getID() + " / e" + curmod.getElimEdge().getID() + " is valid");
             if (animate) {
+                ui.showApply();
+            }
+            curmod.applyMod(gr);
+            if (animate) {
+                table.refresh();
                 ui.showNEModComplete();
             }
         }
+        completed=true;
         gr.purgeDeletedEdges();
         if (animate) {
             table.empty();
@@ -207,13 +224,33 @@ public class STBOI {
         mods.clear();
         gr.clearGraph();
     }
+    
+    public void clearMods(){
+        mods.clear();
+    }
 
     public void empty() {
         table.stop();
         table.empty();
     }
-    
-    public boolean isModified(){
+
+    public boolean isModified() {
         return modified;
+    }
+
+    public boolean isRunning() {
+        return timer.isRunning();
+    }
+    
+    public boolean isComplete(){
+        if(completed){
+            completed=false;
+            return true;
+        }
+        return false;
+    }
+
+    public void runImprove(boolean animate) {
+
     }
 }

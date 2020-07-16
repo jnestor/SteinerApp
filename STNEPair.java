@@ -103,8 +103,8 @@ public class STNEPair implements Comparable/*<STNEPair>*/ {
 
   /** apply the BOI modification if gain is positive and the edges still exist -
   return false if move not applied */
-  public boolean applyMod(STGraph gr) {
-    if (!modValid()) return false;
+  public STNode applyMod(STGraph gr) {
+    if (!modValid()) return null;
     STNode nn = new STNode(steinerPoint, false);  // the new Steiner point
     gr.addNode(nn);
 //    System.out.println("disconnecting " + elimEdge);
@@ -118,7 +118,7 @@ public class STNEPair implements Comparable/*<STNEPair>*/ {
     gr.addEdge(n1, nn);
     gr.addEdge(n2, nn);
     gr.addEdge(node, nn);
-    return true;
+    return nn;
   }
 
   /** used to sort in DESCENDING order! */

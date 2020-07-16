@@ -18,11 +18,13 @@ import javax.swing.BorderFactory;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.io.*;
 import java.net.*;
 import javax.swing.ImageIcon;
 
-public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChangeListener {
+public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChangeListener{
 
     private STGraph gr;
     private UIHananGraph ugr;
@@ -39,7 +41,6 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
     private JToggleButton clearButton;
 
     private boolean steinerMode = false;
-    private int rmstLength = 0;
 
     public UISteinerDemo() {
         super();
@@ -84,7 +85,7 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
         halfPerimDisplay.setValue(gr.halfPerim());
         lengthDisplay.setValue(gr.edgeLength());
         if (steinerMode) {
-            improveDisplay.setValue((double) rmstLength / (double) gr.edgeLength());
+            improveDisplay.setValue((double) ugr.getPastLength() / (double) gr.edgeLength());
         } else {
             improveDisplay.setValue(1.0);
         }
@@ -134,7 +135,6 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
                 } catch (InterruptedException except) {
                 }
                 }
-                rmstLength = gr.edgeLength(); // use to figure improvement
                 repaint();
             } else {
                 steinerMode = false;
@@ -186,4 +186,10 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
         f.setVisible(true);
     }
 
+    
+    
+    @Override
+    public void repaint(){
+        super.repaint();
+    }
 }

@@ -44,9 +44,9 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
         int orig_x = loc.x - TERM_SIZE / 2;
         int orig_y = loc.y - TERM_SIZE / 2;
         if (isSelected) {
-            fillColor = new Color(255, 106, 0);
+            fillColor = Color.yellow;
         } else if (n.isVisited()) {
-            fillColor = Color.green;
+            fillColor = new Color(2, 199, 54);
         } else {
             fillColor = Color.blue;
         }
@@ -74,7 +74,7 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
         if (e == selEdge) {
             g.setColor(Color.blue);
         } else {
-            g.setColor(Color.red);
+            g.setColor(new Color (255, 0, 204));
         }
         //	System.out.println("drawing edge from " + loc1 + " to " + loc2);
         g.drawLine(loc1.x, loc1.y, loc2.x, loc2.y);

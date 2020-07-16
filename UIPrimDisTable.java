@@ -69,7 +69,7 @@ public class UIPrimDisTable extends UITablePanel {
         }
         while (!edgeTable.isEmpty()) {
             STEdge edge = edgeTable.pollFirst();
-            append(edge.toTableString(), Integer.toString(edge.length()),Color.green,Color.blue);
+            append(edge.toTableString(), Integer.toString(edge.length()),new Color (0, 138, 36),Color.blue);
         }
     }
 
@@ -79,10 +79,6 @@ public class UIPrimDisTable extends UITablePanel {
         super.empty();
     }
 
-    public void refresh() {
-        tableThread.setRepeats(false);
-        tableThread.start();
-    }
 
     public void stop() {
         tableThread.stop();

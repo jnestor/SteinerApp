@@ -6,10 +6,11 @@
  * @Last modified by: nestorj
  * @Last modified time: 2020-06-24T21:01:04-04:00
  */
-
 import java.lang.Math;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -18,9 +19,12 @@ import javax.swing.BorderFactory;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Graphics;
+import java.awt.event.ItemEvent;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JCheckBox;
+import javax.swing.JToggleButton;
 
 public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UIGraphChangeListener {
 
@@ -32,6 +36,8 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
     private JPanel statusPanel;
     private JPanel controlPanel;
     private JLabel messageLabel;
+    private JToggleButton steinerModeButton;
+    private JCheckBox gridModBox = new JCheckBox("Modifiable",true);
 
     private UIValDisplay halfPerimDisplay;
     private UIValDisplay lengthDisplay;
@@ -39,9 +45,8 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
     private UIValDisplay trailDisplay;
 
     private UIAnimationController ucontrol;
-    
-    private int originalLength=0;
-    private int numTrail=0;
+
+    private int numTrail = 1;
 
     public static final long serialVersionUID = 1L;  // to shut up serialization warning
 
@@ -53,36 +58,43 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         prim = new STPrimMST(null, gr);  // no animation callbacks for MST
         boi = new STBOI(this, gr);
         ucontrol = new UIAnimationController(this);
-
+        steinerModeButton = new JToggleButton("STMODE");
+        steinerModeButton.setActionCommand("STMODE");
+        steinerModeButton.addActionListener(this::showHananGrids);
+        gridModBox.addItemListener(this::setModifiable);
+        
         statusPanel = new JPanel();
         statusPanel.setLayout(new GridLayout(1, 2));
         halfPerimDisplay = new UIValDisplay("Half Perimeter", 0);
         statusPanel.add(halfPerimDisplay);
         lengthDisplay = new UIValDisplay("Edge Length", 0);
         statusPanel.add(lengthDisplay);
-        improveDisplay = new UIValDisplay("Improvement",1, 1,2);
+        improveDisplay = new UIValDisplay("Improvement", 1, 1, 2);
         statusPanel.add(improveDisplay);
-        trailDisplay = new UIValDisplay("Number of Trail", 0);
+        trailDisplay = new UIValDisplay("Current Trail", 1);
         statusPanel.add(trailDisplay);
         add(statusPanel, BorderLayout.NORTH);
         add(ugr, BorderLayout.CENTER);
 
         controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        controlPanel.add(ucontrol);
-
         messageLabel = new JLabel("");
+        messageLabel.setPreferredSize(new Dimension(250,25));
         controlPanel.add(messageLabel);
+        controlPanel.add(ucontrol);
+        controlPanel.add(steinerModeButton);
+        controlPanel.add(gridModBox);
         add(controlPanel, BorderLayout.SOUTH);
 
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        
+
     }
 
     public void setCostDisplay() {
         halfPerimDisplay.setValue(gr.halfPerim());
         lengthDisplay.setValue(gr.edgeLength());
-        improveDisplay.setValue((float)originalLength/gr.edgeLength());
+        improveDisplay.setValue((float) ugr.getPastLength() / gr.edgeLength());
+        if(boi.isComplete()) numTrail++;
         trailDisplay.setValue(numTrail);
     }
 
@@ -97,9 +109,9 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         gr.addRandomNodes(10, width, height); // change to use range of graphics window
         try {
             prim.primMST(false);
+            ugr.setPastLength(gr.edgeLength());
         } catch (InterruptedException e) {
         }
-        originalLength=gr.edgeLength();
     }
 
     public void readGraph(BufferedReader in) throws IOException {
@@ -110,48 +122,60 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         super.paintComponent(g);
         setCostDisplay();
     }
+    
+     /*----------------------------------------------------------------------*/
+ /*        ActionListener method                                         */
+ /*----------------------------------------------------------------------*/
+    public synchronized void showHananGrids(ActionEvent e) {
+        String cmd = e.getActionCommand();
+        System.out.println("STMODE");
+        if (cmd == "STMODE") {
+            if (steinerModeButton.isSelected()) {
+                steinerModeButton.setToolTipText("Editing Steiner Points - Click to Edit Terminals");
+                ugr.setHananMode(true);
+                ugr.selectNode(null);            
+            } else {
+                steinerModeButton.setToolTipText("Editing Terminals - Click to Edit Steiner Points");
+                ugr.setHananMode(false);
+            }
+             repaint();
+        }
+    }
+    
+    public synchronized void setModifiable(ItemEvent e){
+        ugr.enableModification(e.getStateChange() == 1);
+    }
 
     /*----------------------------------------------------------------------*/
  /*        methods from UIAnimated interface                             */
  /*----------------------------------------------------------------------*/
  /* from the new thread - use to call the algorithm code */
     public void runAnimation() throws InterruptedException {
+        boi.empty();
         boi.improve(true);
-        if(boi.isModified()){
-            numTrail++;
-            setCostDisplay();
-        }
+        setCostDisplay();
     }
 
     /* use to clean up when animation is terminated */
     public void stopAnimation() {
-        if(boi.isModified()){
-            numTrail++;
-        }
+        ugr.selectNEPair(null);
         setMessage("Click to create nodes");
-        boi.empty();
         setCostDisplay();
+        boi.empty();
+        repaint();
     }
 
     public void clear() {
-        try {
-            boi.clear();
-            boi.improve(true);
-            numTrail=0;
-            improveDisplay.setString("NaN");
-        } catch (InterruptedException ex) {
-            Logger.getLogger(UISteinerBOI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        boi.clear();
+        ugr.selectNEPair(null);
+        numTrail = 1;
+        improveDisplay.setString("NaN");
     }
-    
-    public void step(){
-        try {
-            ucontrol.animateDelay();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(UISteinerBOI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
+    public void step() throws InterruptedException {
+        ucontrol.animateDelay();
     }
-    
+
     /*----------------------------------------------------------------------*/
  /*        methods from BOIInterface                                     */
  /*----------------------------------------------------------------------*/
@@ -194,7 +218,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         ugr.selectNode(p.getNode());
         ugr.selectEdge(p.getElimEdge());
         ugr.selectNEPair(p);
-        setMessage("node " + p.getNode().getID() + " / edge " + p.getElimEdge().getID() + " gain: " + p.getGain());
+        setMessage("Node-edge candidate:  n" + p.getNode().getID() + " / e" + p.getElimEdge().getID() + " gain: " + p.getGain());
         repaint();
         ucontrol.animateDelay();
     }
@@ -206,7 +230,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         ugr.selectNode(null);
         ugr.selectEdge(null);
         ugr.selectNEPair(p);
-        setMessage("Applying modification gain=" + p.getGain());
+        setMessage("Applying modification n" + p.getNode().getID() + " / e" + p.getElimEdge().getID() + " gain=" + p.getGain());
         repaint();
         ucontrol.animateDelay();
     }
@@ -252,16 +276,38 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         ucontrol.animateDelay();
         ugr.selectNode(null);
     }
+    
+    public void showAccept() throws InterruptedException{
+        ugr.setColor(Color.yellow);
+        repaint();
+        ucontrol.animateDelay();
+        ugr.setColor(Color.gray);
+    }
+    
+    public void showDeny() throws InterruptedException{
+        ugr.setColor(Color.red);
+        repaint();
+        ucontrol.animateDelay();
+        ugr.setColor(Color.gray);
+    }
+    
+    public void showApply() throws InterruptedException{
+        ugr.setColor(Color.green);
+        repaint();
+        ucontrol.animateDelay();
+        ugr.setColor(Color.gray);
+    }
 
     /*----------------------------------------------------------------------*/
  /*        UIGraphChangeListener method                                  */
  /*----------------------------------------------------------------------*/
     @Override
     public void graphChanged() {
-        originalLength=gr.edgeLength();
-        numTrail=0;
+        numTrail = 1;
         improveDisplay.setValue(1);
         ucontrol.interruptAnimation();
+        boi.empty();
+        boi.clearMods();
         try {
             prim.primMST(false);
         } catch (InterruptedException e) {

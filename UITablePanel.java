@@ -50,14 +50,16 @@ public abstract class UITablePanel extends JPanel {
     abstract void refreshTable();
 
     public void empty() {
+        stop();
         edgeNames.setText("");
         edgeDistances.setText("");
         repaint();
     }
 
-    public void refresh() {
+    public boolean refresh() throws InterruptedException {
         tableThread.setRepeats(false);
         tableThread.start();
+        return true;
     }
 
     public void stop() {
@@ -69,18 +71,29 @@ public abstract class UITablePanel extends JPanel {
         highlight(edgeDistances, c);
     }
 
-    public void highlight(Color c, String s1, String s2) {
-        try {
-            highlight(edgeNames, c, s1);
+    public void highlight(Color c, String s1, String s2) throws InterruptedException {
+        while(tableThread.isRunning()){
+            wait(10);
+            System.out.println("Wait");
+        }
             Document doc = edgeNames.getDocument();
             Document doc2 = edgeDistances.getDocument();
+        try {
+            highlight(edgeNames, c, s1);
             int index = doc.getText(0, doc.getLength()).indexOf(s1);
-            int lineNum = getLineCount(doc.getText(0, doc.getLength()),index);
-            int lineIndex = getLineIndex(doc2.getText(0, doc2.getLength()),lineNum);
-            highlight(edgeDistances,c,lineIndex,lineIndex+s2.length());
+            int lineNum = getLineCount(doc.getText(0, doc.getLength()), index);
+            int lineIndex = getLineIndex(doc2.getText(0, doc2.getLength()), lineNum);
+            highlight(edgeDistances, c, lineIndex, lineIndex + s2.length());
             //highlight(edgeDistances,c,s2);
-        } catch (BadLocationException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(UITablePanel.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(s1);
+            System.out.println(s2);
+            try {
+                System.out.println(doc.getText(0, doc.getLength()));
+            } catch (BadLocationException ex1) {
+                Logger.getLogger(UITablePanel.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
     }
 
@@ -98,18 +111,14 @@ public abstract class UITablePanel extends JPanel {
         }
     }
 
-    private void highlight(JTextPane pane, Color c, String s) {
+    private void highlight(JTextPane pane, Color c, String s) throws BadLocationException {
         if (!pane.getText().isEmpty()) {
             Highlighter hilit = new DefaultHighlighter();
             Highlighter.HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(c);
             pane.setHighlighter(hilit);
-            try {
-                Document doc = pane.getDocument();
+            Document doc = pane.getDocument();
                 int index = doc.getText(0, doc.getLength()).indexOf(s);
                 hilit.addHighlight(index, index + s.length(), painter);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(UIPrimDisTable.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 
@@ -121,8 +130,6 @@ public abstract class UITablePanel extends JPanel {
             try {
                 hilit.addHighlight(start, end, painter);
             } catch (BadLocationException ex) {
-                Logger.getLogger(UIPrimDisTable.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println(start+" "+end);
             }
         }
     }
@@ -132,9 +139,9 @@ public abstract class UITablePanel extends JPanel {
         int last = s.lastIndexOf("\n");
         String sub = s.substring(0, end);
         int lineCount = 0;
-        while (i < end&&i<last&&i>=0) {
+        while (i < end && i < last && i >= 0) {
             lineCount++;
-            i = sub.indexOf("\n",i+1);
+            i = sub.indexOf("\n", i + 1);
         }
         return lineCount;
     }
@@ -142,10 +149,10 @@ public abstract class UITablePanel extends JPanel {
     private int getLineIndex(String s, int lineNum) {
         int lineCount = 0;
         int i = 0;
-        while (lineCount < lineNum&&i>=0) {
+        while (lineCount < lineNum && i >= 0) {
             lineCount++;
-            i = s.indexOf("\n", i+1);
-            
+            i = s.indexOf("\n", i + 1);
+
         }
         return i + 1;
     }
@@ -196,21 +203,21 @@ public abstract class UITablePanel extends JPanel {
             Logger.getLogger(UIPrimDisTable.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void append(String a, String b,Color c1,Color c2) {
+
+    public void append(String a, String b, Color c1, Color c2) {
         try {
             StyledDocument nameDoc = (StyledDocument) edgeNames.getDocument();
             StyledDocument disDoc = (StyledDocument) edgeDistances.getDocument();
             Style style = edgeNames.addStyle("I'm a Style", null);
-            
+            StyleConstants.setBold(style, true);
             int end = a.indexOf("-");
-            nameDoc.insertString(nameDoc.getLength(), " " +a.substring(0, 1), null);
+            nameDoc.insertString(nameDoc.getLength(), " " + a.substring(0, 1), null);
             StyleConstants.setForeground(style, c1);
-            nameDoc.insertString(nameDoc.getLength(), " " +a.substring(1, end), style);
-            nameDoc.insertString(nameDoc.getLength(), a.substring(end, end+2), null);
+            nameDoc.insertString(nameDoc.getLength(), " " + a.substring(1, end), style);
+            nameDoc.insertString(nameDoc.getLength(), a.substring(end, end + 2), null);
             StyleConstants.setForeground(style, c2);
-            nameDoc.insertString(nameDoc.getLength(), a.substring(end+2,a.length()-1), style);
-            nameDoc.insertString(nameDoc.getLength(), a.substring(a.length()-1,a.length())+" "+"\n", null);
+            nameDoc.insertString(nameDoc.getLength(), a.substring(end + 2, a.length() - 1), style);
+            nameDoc.insertString(nameDoc.getLength(), a.substring(a.length() - 1, a.length()) + " " + "\n", null);
             disDoc.insertString(disDoc.getLength(), " " + b + " " + "\n", null);
             SimpleAttributeSet center = new SimpleAttributeSet();
             StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);

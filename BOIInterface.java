@@ -32,6 +32,12 @@ interface BOIInterface {
   
   public void setMessage(String s);
   
-  public void step();
+  public void step() throws InterruptedException;
+  
+  public void showAccept()throws InterruptedException;
+  
+  public void showDeny()throws InterruptedException;
+  
+  public void showApply() throws InterruptedException;
 
 }
