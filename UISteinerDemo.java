@@ -39,6 +39,7 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
 
     private JToggleButton steinerModeButton;
     private JToggleButton clearButton;
+    private JToggleButton clearSTBtn;
 
     private boolean steinerMode = false;
 
@@ -56,6 +57,9 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
         clearButton.setToolTipText("Clear all nodes");
         clearButton.setActionCommand("CLEAR");
         clearButton.addActionListener(this);
+        clearSTBtn=new JToggleButton(new ImageIcon(getClass().getResource("images/clearST.gif")));
+        clearSTBtn.addActionListener(this::clearST);
+        clearSTBtn.setToolTipText("Remove all Steiner Nodes");
 
         statusPanel = new JPanel();
         statusPanel.setLayout(new GridLayout(1, 2));
@@ -75,6 +79,7 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(steinerModeButton);
         controlPanel.add(clearButton);
+        controlPanel.add(clearSTBtn);
         add(controlPanel, BorderLayout.SOUTH);
 
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -162,7 +167,7 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
     /*----------------------------------------------------------------------*/
  /*        UIGraphChangeListener method                                  */
  /*----------------------------------------------------------------------*/
-    public void graphChanged() {
+    public void graphChanged(boolean b) {
         try {
             if (!gr.isEmpty()) {
                 prim.primMST(false);
@@ -186,7 +191,13 @@ public class UISteinerDemo extends JPanel implements ActionListener, UIGraphChan
         f.setVisible(true);
     }
 
-    
+    public void clearST(ActionEvent e){
+        gr.removeNonTerminalNodes();
+        graphChanged(true);
+        ugr.setPastLength(gr.edgeLength());
+        repaint();
+        clearSTBtn.setSelected(false);
+    }
     
     @Override
     public void repaint(){

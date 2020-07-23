@@ -213,7 +213,7 @@ public class UIPrimMST extends JPanel implements PrimMSTInterface, UIAnimated, A
  /*        UIGraphChangeListener method                                  */
  /*----------------------------------------------------------------------*/
     @Override
-    public void graphChanged() {
+    public void graphChanged(boolean b) {
         if (autoMode) {
             try {
                 if (!gr.isEmpty()) {

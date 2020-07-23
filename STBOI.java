@@ -201,6 +201,8 @@ public class STBOI {
                 ui.showApply();
             }
             curmod.applyMod(gr);
+            gr.purgeDeletedEdges();
+            table.getParent().repaint();
             if (animate) {
                 table.refresh();
                 ui.showNEModComplete();

@@ -6,7 +6,6 @@
  * @Last modified by: nestorj
  * @Last modified time: 2020-06-24T21:04:11-04:00
  */
-
 import java.awt.BasicStroke;
 import java.awt.Point;
 import java.awt.Color;
@@ -28,8 +27,9 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
     private boolean hananMode = false;
     private STNEPair selectedNEPair = null;
     private Color c = Color.gray;
-    private int pastLength = 0;
-    private boolean changable=true;
+
+    private boolean changable = true;
+
     public UIHananGraph(STGraph g, UIGraphChangeListener cl) {
         super(g, cl);
     }
@@ -63,9 +63,8 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        if (!hananMode&&changable) {
+        if (!hananMode && changable) {
             super.mousePressed(e);
-            pastLength=gr.edgeLength();
         } else {
             Point mouseLoc = e.getPoint();
             selNode = gr.findNode(mouseLoc, TERM_SIZE); 	    // see if mouse is over an existing terminal
@@ -86,7 +85,7 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
                 gr.addNode(selNode);
             }
             if (changeListener != null) {
-                changeListener.graphChanged();
+                changeListener.graphChanged(false);
             }
             getParent().repaint();
 
@@ -119,10 +118,10 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(changable){
-        pastLength=gr.edgeLength();
-        //if (!hananMode) {
-        gr.removeNonTerminalNodes();
+        if (selNode != null && selNode.isTerminal() && changable) {
+            setPastLength(gr.edgeLength());
+            //if (!hananMode) {
+            gr.removeNonTerminalNodes();
             super.mouseDragged(e);
         }
         //}
@@ -141,22 +140,22 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
     /*----------------------------------------------------------------------*/
  /*           Graphics                                                   */
  /*----------------------------------------------------------------------*/
-    public void setColor(Color color){
-        c=color;
+    public void setColor(Color color) {
+        c = color;
     }
-    
+
     public void drawBBox(Graphics g, Point p1, Point p2) {
         int minx = Math.min(p1.x, p2.x);
         int maxx = Math.max(p1.x, p2.x);
         int miny = Math.min(p1.y, p2.y);
         int maxy = Math.max(p1.y, p2.y);
-        Graphics2D g2=(Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
         double thickness = 2;
         g2.setStroke(new BasicStroke((float) thickness));
         g2.drawRect(minx, miny, maxx - minx, maxy - miny);
     }
 
-    public void drawNEPair(Graphics g, STNEPair p){
+    public void drawNEPair(Graphics g, STNEPair p) {
         STEdge e = p.getEdge();
         g.setColor(c);
         drawBBox(g, e.getP1().getLocation(), e.getP2().getLocation());
@@ -164,7 +163,7 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
             return;
         }
         Point nloc = p.getNode().getLocation();
-        Graphics2D g2=(Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
         double thickness = 2;
         g2.setStroke(new BasicStroke((float) thickness));
         g2.drawLine(nloc.x, nloc.y, p.getSteiner().x, p.getSteiner().y);
@@ -208,16 +207,8 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
             drawNEPair(g, selectedNEPair);
         }
     }
-    
-    public int getPastLength(){
-        return pastLength;
-    }
-    
-    public void setPastLength(int i){
-        pastLength=i;
-    }
-    
-    public void enableModification(boolean b){
+
+    public void enableModification(boolean b) {
         changable = b;
     }
 

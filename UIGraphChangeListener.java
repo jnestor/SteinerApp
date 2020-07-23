@@ -13,5 +13,5 @@
 */
 
 interface UIGraphChangeListener {
-  public void graphChanged();
+  public void graphChanged(boolean modified);
 }

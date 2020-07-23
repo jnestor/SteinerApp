@@ -23,6 +23,8 @@ import java.awt.event.ItemEvent;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JToggleButton;
 
@@ -38,6 +40,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
     private JLabel messageLabel;
     private JToggleButton steinerModeButton;
     private JCheckBox gridModBox = new JCheckBox("Modifiable",true);
+    private JToggleButton clearSTBtn;
 
     private UIValDisplay halfPerimDisplay;
     private UIValDisplay lengthDisplay;
@@ -58,10 +61,14 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         prim = new STPrimMST(null, gr);  // no animation callbacks for MST
         boi = new STBOI(this, gr);
         ucontrol = new UIAnimationController(this);
-        steinerModeButton = new JToggleButton("STMODE");
+        steinerModeButton = new JToggleButton("HGrid");
+        steinerModeButton.setToolTipText("show Hanan Grids");
         steinerModeButton.setActionCommand("STMODE");
         steinerModeButton.addActionListener(this::showHananGrids);
+        clearSTBtn=new JToggleButton(new ImageIcon(getClass().getResource("images/clearST.gif")));
         gridModBox.addItemListener(this::setModifiable);
+        clearSTBtn.addActionListener(this::clearST);
+        clearSTBtn.setToolTipText("Remove all Steiner Nodes");
         
         statusPanel = new JPanel();
         statusPanel.setLayout(new GridLayout(1, 2));
@@ -71,7 +78,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         statusPanel.add(lengthDisplay);
         improveDisplay = new UIValDisplay("Improvement", 1, 1, 2);
         statusPanel.add(improveDisplay);
-        trailDisplay = new UIValDisplay("Current Trail", 1);
+        trailDisplay = new UIValDisplay("Current Pass", 1);
         statusPanel.add(trailDisplay);
         add(statusPanel, BorderLayout.NORTH);
         add(ugr, BorderLayout.CENTER);
@@ -82,6 +89,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         messageLabel.setPreferredSize(new Dimension(250,25));
         controlPanel.add(messageLabel);
         controlPanel.add(ucontrol);
+        controlPanel.add(clearSTBtn);
         controlPanel.add(steinerModeButton);
         controlPanel.add(gridModBox);
         add(controlPanel, BorderLayout.SOUTH);
@@ -96,6 +104,10 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         improveDisplay.setValue((float) ugr.getPastLength() / gr.edgeLength());
         if(boi.isComplete()) numTrail++;
         trailDisplay.setValue(numTrail);
+        for(STNode n : gr.getNodes()){
+            if(!n.isTerminal())
+                System.out.println(n.toString());
+        }
     }
 
     public void setMessage(String m) {
@@ -128,7 +140,6 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
  /*----------------------------------------------------------------------*/
     public synchronized void showHananGrids(ActionEvent e) {
         String cmd = e.getActionCommand();
-        System.out.println("STMODE");
         if (cmd == "STMODE") {
             if (steinerModeButton.isSelected()) {
                 steinerModeButton.setToolTipText("Editing Steiner Points - Click to Edit Terminals");
@@ -144,6 +155,15 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
     
     public synchronized void setModifiable(ItemEvent e){
         ugr.enableModification(e.getStateChange() == 1);
+    }
+    
+    public void clearST(ActionEvent e){
+        stopAnimation();
+        gr.removeNonTerminalNodes();
+        graphChanged(true);
+        ugr.setPastLength(gr.edgeLength());
+        repaint();
+        clearSTBtn.setSelected(false);
     }
 
     /*----------------------------------------------------------------------*/
@@ -183,7 +203,6 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
      * Interesting event: initialization
      */
     public void showBOIInit() throws InterruptedException {
-        System.out.println("showBOIInit");
         ugr.selectNode(null);
         ugr.selectEdge(null);
         setMessage("Starting BOI improve phase");
@@ -302,9 +321,9 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
  /*        UIGraphChangeListener method                                  */
  /*----------------------------------------------------------------------*/
     @Override
-    public void graphChanged() {
+    public void graphChanged(boolean changed) {
+        if(changed)
         numTrail = 1;
-        improveDisplay.setValue(1);
         ucontrol.interruptAnimation();
         boi.empty();
         boi.clearMods();

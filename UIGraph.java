@@ -6,7 +6,6 @@
  * @Last modified by: nestorj
  * @Last modified time: 2020-06-24T21:04:38-04:00
  */
-
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -24,6 +23,8 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
     public static final long serialVersionUID = 1L; // to shut up warning
 
     protected UIGraphChangeListener changeListener;
+
+    private int pastLength = 0;
 
     public UIGraph(STGraph g, UIGraphChangeListener cl) {
         gr = g;
@@ -74,7 +75,7 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
         if (e == selEdge) {
             g.setColor(Color.blue);
         } else {
-            g.setColor(new Color (255, 0, 204));
+            g.setColor(new Color(255, 0, 204));
         }
         //	System.out.println("drawing edge from " + loc1 + " to " + loc2);
         g.drawLine(loc1.x, loc1.y, loc2.x, loc2.y);
@@ -142,15 +143,24 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
     public void mousePressed(MouseEvent e) {
         Point mouseLoc = e.getPoint();
         selNode = gr.findNode(mouseLoc, TERM_SIZE);
+        boolean modified = false;
         if (selNode == null) {
             selNode = new STNode(mouseLoc);
             gr.addNode(selNode);
+            modified = true;
         } else if (e.isControlDown()) {  // ctrl-click removes a node
             gr.removeNode(selNode);
+            if (selNode.isTerminal()) {
+                gr.removeNonTerminalNodes();
+                modified = true;
+            }
             selNode = null;
         }
         if (changeListener != null) {
-            changeListener.graphChanged();
+            changeListener.graphChanged(modified);
+            if (modified) {
+                pastLength = gr.edgeLength();
+            }
         }
         getParent().repaint();
     }
@@ -158,7 +168,7 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
     public void mouseReleased(MouseEvent e) {
         selNode = null;
         if (changeListener != null) {
-            changeListener.graphChanged();
+            changeListener.graphChanged(false);
         }
         getParent().repaint();
     }
@@ -173,7 +183,7 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
         if (selNode != null) {
             selNode.setLocation(e.getPoint());
             if (changeListener != null) {
-                changeListener.graphChanged();
+                changeListener.graphChanged(true);
             }
             getParent().repaint();
         }
@@ -202,5 +212,13 @@ public class UIGraph extends JPanel implements MouseListener, MouseMotionListene
         g.addNode(n2);
         g.addNode(n3);
         f.repaint();
+    }
+
+    public int getPastLength() {
+        return pastLength;
+    }
+
+    public void setPastLength(int i) {
+        pastLength = i;
     }
 }

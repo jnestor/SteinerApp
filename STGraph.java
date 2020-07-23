@@ -56,6 +56,7 @@ public class STGraph  {
       STNode n = getNode(i);
       if (!n.isTerminal()) removeNode(n);
     }
+    purgeDeletedEdges();
   }
 
   public STNode getNode(int i) {
@@ -179,7 +180,8 @@ public class STGraph  {
   // probably want to store this and adjust incrementally when nodes are added/removed
   public int edgeLength() {
     int length = 0;
-    for (int i = 0; i < numEdges(); i++)
+    int i =0;
+    for (i = 0; i < numEdges(); i++)
     length += getEdge(i).length();
     return length;
   }
