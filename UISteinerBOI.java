@@ -221,11 +221,11 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         ugr.selectEdge(p.getEdge());
         setMessage("Pair Candidate");
         repaint();
-        //	setMessage("Pair Candidate " + p.getNode() + " " + p.getEdge());
+        //  setMessage("Pair Candidate " + p.getNode() + " " + p.getEdge());
         ucontrol.animateDelay();
-        //	ugr.selectNode(null);
-        //	ugr.selectEdge(null);
-        //	setMessage(null);
+        //  ugr.selectNode(null);
+        //  ugr.selectEdge(null);
+        //  setMessage(null);
     }
 
     /**
@@ -332,7 +332,7 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         } catch (InterruptedException e) {
         }
 
-        /*	if (autoMode) { // re-calculate immediately
+        /*  if (autoMode) { // re-calculate immediately
       try {
       prim.primMST(false);
     } catch (InterruptedException e) { }
@@ -355,6 +355,10 @@ public class UISteinerBOI extends JPanel implements BOIInterface, UIAnimated, UI
         f.getContentPane().add(p.boi.table, BorderLayout.EAST);
         f.setVisible(true);
         p.initRandom();
+    }
+    
+    public STBOI getBOI(){
+        return boi;
     }
 
 }

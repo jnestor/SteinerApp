@@ -95,6 +95,7 @@ public class UIHananGraph extends UIGraph implements MouseListener, MouseMotionL
     @Override
     public void mouseReleased(MouseEvent e) {
         if (!hananMode) {
+            gr.removeNonTerminalNodes();
             super.mouseReleased(e);
         } else {
             selNode = null;
